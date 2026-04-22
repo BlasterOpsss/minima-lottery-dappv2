@@ -9,34 +9,35 @@
 
 <div class="container">
 
-    <h1>🎰 MINIMA LOTTERY</h1>
+    <h1 class="gradient-text">MINIMA LOTTERY</h1>
+    <p class="subtitle">Fair • On-chain • Transparent</p>
 
-    <div class="card">
+    <div class="card glass">
         <p id="walletStatus">🔌 Connecting...</p>
     </div>
 
-    <div class="card">
+    <div class="card glass">
         <h3>⏳ Next Draw</h3>
         <h2 id="timer">--:--:--</h2>
     </div>
 
-    <div class="card glow">
+    <div class="card glass glow">
         <h3>💰 Prize Pool</h3>
-        <h2 id="prizePool">1 MINIMA</h2>
+        <h2 id="prizePool">0 MINIMA</h2>
     </div>
 
-    <div class="card">
+    <div class="card glass">
         <h3>🎟 Ticket Price</h3>
         <h2>0.0000001 MINIMA</h2>
         <button onclick="buyTicket()">Buy Ticket</button>
     </div>
 
-    <div class="card">
+    <div class="card glass">
         <h3>Entries (<span id="entryCount">0</span>)</h3>
         <ul id="entries"></ul>
     </div>
 
-    <div class="card">
+    <div class="card glass">
         <h3>📊 Your Stats</h3>
         <p id="yourStats">Loading...</p>
     </div>
@@ -45,7 +46,7 @@
 
 <!-- WINNER POPUP -->
 <div id="winnerPopup" class="popup hidden">
-    <div class="popup-box">
+    <div class="popup-box glass">
         <h2>🎉 WINNER 🎉</h2>
         <p id="winnerText"></p>
     </div>
