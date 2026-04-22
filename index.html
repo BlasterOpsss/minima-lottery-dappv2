@@ -1,88 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Minima Lottery</title>
+  <title>Minima Wallet Lottery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<main>
+<div class="app">
 
-  <!-- HEADER -->
-  <header>
-    <h1>MINIMA LOTTERY</h1>
-    <p>TRANSPARENT • FAIR • DECENTRALIZED</p>
-
-    <div class="connection-status" id="walletStatus">
-      <span class="status-indicator"></span>
-      Connecting...
-    </div>
-  </header>
-
-  <!-- GRID -->
-  <div class="content-grid">
-
-    <!-- LEFT SIDE -->
-    <div id="countdownSection" class="card">
-
-      <div class="countdown-label">⏳ NEXT DRAW</div>
-
-      <div id="timer" class="countdown-display">--:--:--</div>
-
-      <div class="stats-grid">
-
-        <div class="stat-item">
-          <div class="stat-label">YOUR TICKETS</div>
-          <div id="yourStats" class="stat-value">0</div>
-        </div>
-
-        <div class="stat-item">
-          <div class="stat-label">TOTAL ENTRIES</div>
-          <div id="entryCount" class="stat-value">0</div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- RIGHT SIDE -->
+  <!-- TOP BAR -->
+  <div class="topbar">
     <div>
-
-      <div id="prizeSection">
-        <div class="section-label">💰 PRIZE POOL</div>
-        <div id="prizePool" class="large-value">0</div>
-        <div class="unit">MINIMA</div>
-      </div>
-
-      <br>
-
-      <div id="ticketSection">
-        <div class="section-label">🎟 TICKET PRICE</div>
-        <div class="large-value">0.0000001</div>
-        <div class="unit">MINIMA</div>
-
-        <button onclick="buyTicket()">BUY TICKET</button>
-      </div>
-
+      <h1>Wallet</h1>
+      <p id="walletStatus">Connecting...</p>
     </div>
+    <div class="avatar">🟣</div>
+  </div>
 
+  <!-- BALANCE CARD -->
+  <div class="balance-card">
+    <p class="label">Total Prize Pool</p>
+    <h2 id="prizePool">0 MINIMA</h2>
+  </div>
+
+  <!-- ACTION -->
+  <div class="action-card">
+    <button onclick="buyTicket()">Buy Ticket</button>
+  </div>
+
+  <!-- TIMER -->
+  <div class="card">
+    <p class="label">Next Draw</p>
+    <h2 id="timer">--:--:--</h2>
   </div>
 
   <!-- ENTRIES -->
-  <div class="entries-section">
-    <div class="section-title">ENTRIES</div>
-    <div id="entries"></div>
+  <div class="card">
+    <div class="row">
+      <h3>Activity</h3>
+      <span id="entryCount">0</span>
+    </div>
+    <ul id="entries"></ul>
   </div>
 
-  <!-- WINNERS -->
-  <div class="entries-section">
-    <div class="section-title">WINNERS</div>
-    <div id="winners"></div>
+  <!-- STATS -->
+  <div class="card">
+    <h3>Your Stats</h3>
+    <p id="yourStats">0 tickets</p>
   </div>
 
-</main>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav">
+  <div class="nav-item active">🏠</div>
+  <div class="nav-item">🎟</div>
+  <div class="nav-item">🏆</div>
+  <div class="nav-item">⚙️</div>
+</div>
 
 <script src="app.js"></script>
 
