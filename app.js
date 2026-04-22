@@ -8,6 +8,24 @@ let entries = [];
 
 
 // ===============================
+// 🔧 SAFE ADDRESS EXTRACTOR (KEY FIX)
+// ===============================
+function getWalletAddress(res) {
+    if (!res || !res.status) return null;
+
+    const d = res.data;
+
+    // handle different shapes
+    if (typeof d === "string") return d;
+    if (d && typeof d === "object") {
+        return d.address || d.data || JSON.stringify(d);
+    }
+
+    return null;
+}
+
+
+// ===============================
 // 🔌 INIT
 // ===============================
 window.onload = function () {
@@ -28,6 +46,7 @@ window.onload = function () {
                 document.getElementById("walletStatus").innerText = "✅ Connected";
 
                 loadEntries();
+                startTimer();
             }
 
             if (msg.event === "MINIMASK_PENDING") {
@@ -47,18 +66,19 @@ window.onload = function () {
 
 
 // ===============================
-// 🎟 BUY TICKET
+// 🎟 BUY TICKET (FIXED)
 // ===============================
 function buyTicket() {
 
     MINIMASK.account.getAddress(function (res) {
 
-        if (!res || !res.status) {
-            alert("Login to MiniMask first");
+        const wallet = getWalletAddress(res);
+
+        if (!wallet) {
+            alert("Failed to get wallet address");
             return;
         }
 
-        const wallet = String(res.data || "");
         const time = new Date().toLocaleString();
 
         const state = {};
@@ -98,8 +118,8 @@ function loadEntries() {
 
         console.log("RAW RESPONSE:", resp);
 
-        let html = "";
         entries = [];
+        let html = "";
 
         if (!resp || !resp.data || resp.data.length === 0) {
             document.getElementById("entries").innerHTML = "<li>No entries yet</li>";
@@ -113,7 +133,6 @@ function loadEntries() {
 
             if (!coin || !coin.state) continue;
 
-            // 🔥 Read all state values
             for (let key in coin.state) {
 
                 let raw = coin.state[key];
@@ -162,12 +181,12 @@ function updateStats() {
 
     MINIMASK.account.getAddress(function (res) {
 
-        if (!res || !res.status) {
+        const wallet = getWalletAddress(res);
+
+        if (!wallet) {
             document.getElementById("yourStats").innerText = "Not connected";
             return;
         }
-
-        const wallet = String(res.data || "");
 
         let count = 0;
 
@@ -196,20 +215,24 @@ function updatePool() {
 
 
 // ===============================
-// 🔧 SAFE SHORT FUNCTION (FIXED)
+// ⏳ TIMER (REPLACES DRAW BUTTON)
 // ===============================
-function short(addr) {
-    if (!addr || typeof addr !== "string") return "???";
-    return addr.slice(0, 6) + "..." + addr.slice(-4);
-}
+let timeLeft = 60;
 
+function startTimer() {
 
+    setInterval(() => {
 
-// ===============================
-// 🚫 DISABLED DRAW WINNER (NO ERROR)
-// ===============================
-function drawWinner() {
-    console.log("Draw winner disabled");
+        timeLeft--;
+
+        if (timeLeft <= 0) {
+            timeLeft = 60;
+            console.log("⏳ Round ended");
+        }
+
+        document.getElementById("timer").innerText = timeLeft + "s";
+
+    }, 1000);
 }
 
 
