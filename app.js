@@ -1,7 +1,7 @@
 // ===============================
-// ⚙ CONFIG (IMPORTANT)
+// ⚙ CONFIG
 // ===============================
-const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99"; // ✅ script address
+const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99"; // ✅ required
 const TICKET_PRICE = "0.0000001";
 
 let entries = [];
@@ -18,12 +18,12 @@ window.onload = function () {
 
             console.log("MiniMask:", msg);
 
-            // ✅ On load
+            // ✅ INIT
             if (msg.event === "MINIMASK_INIT") {
 
                 if (!msg.data.data.loggedon) {
                     document.getElementById("walletStatus").innerText = "❌ Not logged in";
-                    alert("Please login to MiniMask");
+                    alert("Open inside MiniMask browser & login");
                     return;
                 }
 
@@ -32,16 +32,16 @@ window.onload = function () {
                 loadEntries();
             }
 
-            // ✅ After transaction approval
+            // ✅ TRANSACTION RESULT
             if (msg.event === "MINIMASK_PENDING") {
 
-                console.log("Pending:", msg.data);
+                console.log("Pending update:", msg.data);
 
                 if (msg.data.response && msg.data.response.status) {
                     alert("✅ Transaction confirmed!");
-                    loadEntries(); // refresh entries
+                    loadEntries();
                 } else {
-                    alert("❌ Transaction failed");
+                    console.log("Waiting for confirmation...");
                 }
             }
         });
@@ -54,12 +54,12 @@ window.onload = function () {
 
 
 // ===============================
-// 🎟 BUY TICKET (FIXED)
+// 🎟 BUY TICKET
 // ===============================
 function buyTicket() {
 
     const state = {};
-    state[99] = "ticket_" + Date.now(); // ✅ CRITICAL FIX
+    state[99] = "ticket_" + Date.now(); // ✅ IMPORTANT FIX
 
     MINIMASK.account.send(
         TICKET_PRICE,
@@ -82,9 +82,11 @@ function buyTicket() {
 
 
 // ===============================
-// 📥 LOAD ENTRIES (FIXED)
+// 📥 LOAD ENTRIES
 // ===============================
 function loadEntries() {
+
+    console.log("🔄 Loading entries...");
 
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
 
@@ -101,7 +103,8 @@ function loadEntries() {
 
             const coin = resp.data[i];
 
-            // ✅ FIXED KEY (IMPORTANT)
+            console.log("Coin:", coin);
+
             if (coin.state && coin.state[99]) {
 
                 const entry = coin.state[99];
@@ -116,6 +119,15 @@ function loadEntries() {
         document.getElementById("entryCount").innerText = entries.length;
     });
 }
+
+
+
+// ===============================
+// 🔄 AUTO REFRESH (CRITICAL)
+// ===============================
+setInterval(() => {
+    loadEntries();
+}, 10000); // every 10 sec
 
 
 
