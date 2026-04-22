@@ -16,28 +16,19 @@
     </div>
 
     <div class="card">
-        <h3>🎯 Round: <span id="round">1</span></h3>
+        <h3>⏳ Next Draw</h3>
+        <h2 id="timer">--:--:--</h2>
     </div>
 
-    <div class="card">
+    <div class="card glow">
         <h3>💰 Prize Pool</h3>
-        <h2 id="prizePool">0 MINIMA</h2>
+        <h2 id="prizePool">1 MINIMA</h2>
     </div>
 
     <div class="card">
         <h3>🎟 Ticket Price</h3>
         <h2>0.0000001 MINIMA</h2>
-
-        <button class="primary" onclick="buyTicket()">Buy Ticket</button>
-    </div>
-
-    <div class="card">
-        <button class="secondary" onclick="drawWinner()">🏆 Draw Winner</button>
-
-        <div id="winnerBox">
-            <img src="images/trophy.gif" id="winnerImg">
-            <h2 id="winner"></h2>
-        </div>
+        <button onclick="buyTicket()">Buy Ticket</button>
     </div>
 
     <div class="card">
@@ -46,15 +37,18 @@
     </div>
 
     <div class="card">
-        <h3>🏆 Leaderboard</h3>
-        <ul id="leaderboard"></ul>
-    </div>
-
-    <div class="card">
         <h3>📊 Your Stats</h3>
         <p id="yourStats">Loading...</p>
     </div>
 
+</div>
+
+<!-- WINNER POPUP -->
+<div id="winnerPopup" class="popup hidden">
+    <div class="popup-box">
+        <h2>🎉 WINNER 🎉</h2>
+        <p id="winnerText"></p>
+    </div>
 </div>
 
 <script src="app.js"></script>
