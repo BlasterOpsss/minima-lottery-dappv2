@@ -1,7 +1,7 @@
 // ===============================
-// ⚙ CONFIG
+// ⚙ CONFIG (IMPORTANT)
 // ===============================
-const LOTTERY_ADDRESS = "MxG086HDR94WWW3ZJE24E807D5SQ7F5WUDQFNN9N221P89D698ZET9YK8832YJQ";
+const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99"; // ✅ FIXED
 const TICKET_PRICE = "0.0000001";
 
 let entries = [];
@@ -18,6 +18,7 @@ window.onload = function () {
 
             console.log("MiniMask:", msg);
 
+            // ✅ When extension loads
             if (msg.event === "MINIMASK_INIT") {
 
                 if (!msg.data.data.loggedon) {
@@ -28,27 +29,29 @@ window.onload = function () {
 
                 document.getElementById("walletStatus").innerText = "✅ Connected";
 
+                // 🔄 Load entries from blockchain
                 loadEntries();
             }
 
+            // ✅ When transaction finishes
             if (msg.event === "MINIMASK_PENDING") {
 
-                console.log("Pending:", msg.data);
+                console.log("Pending result:", msg.data);
 
                 if (msg.data.response && msg.data.response.status) {
                     alert("✅ Transaction confirmed!");
-                    loadEntries();
+                    loadEntries(); // refresh entries
                 } else {
                     alert("❌ Transaction failed");
                 }
             }
-
         });
 
     } else {
         document.getElementById("walletStatus").innerText = "❌ MiniMask not found";
     }
 };
+
 
 
 // ===============================
@@ -66,10 +69,10 @@ function buyTicket() {
         state,
         function (resp) {
 
-            console.log("Response:", resp);
+            console.log("Send response:", resp);
 
             if (resp.pending) {
-                alert("🎟 Ticket sent! Approve in MiniMask");
+                alert("🎟 Ticket created! Approve in MiniMask");
             } else {
                 alert("❌ Error: " + resp.error);
             }
@@ -78,23 +81,28 @@ function buyTicket() {
 }
 
 
+
 // ===============================
-// 📥 LOAD ENTRIES
+// 📥 LOAD ENTRIES (FIXED)
 // ===============================
 function loadEntries() {
 
-    MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "", "", function (resp) {
+    MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
 
-        console.log("Entries:", resp);
+        console.log("Entries response:", resp);
 
         entries = [];
-
         let html = "";
+
+        if (!resp || !resp.data || resp.data.length === 0) {
+            html = "<li>No entries yet</li>";
+        }
 
         for (let i = 0; i < resp.data.length; i++) {
 
             const coin = resp.data[i];
 
+            // ✅ Only read valid tickets
             if (coin.state && coin.state[1]) {
 
                 const entry = coin.state[1];
@@ -111,6 +119,7 @@ function loadEntries() {
 }
 
 
+
 // ===============================
 // 🎯 DRAW WINNER
 // ===============================
@@ -123,6 +132,7 @@ function drawWinner() {
 
     const winner = entries[Math.floor(Math.random() * entries.length)];
 
+    // 🎉 Show GIF
     document.getElementById("winnerImg").style.display = "block";
 
     document.getElementById("winner").innerHTML =
