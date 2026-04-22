@@ -103,12 +103,25 @@ li {
 }
 
 #winnerImg {
-    width: 60px;
+    width: 90px;
     display: none;
     margin-bottom: 10px;
+    animation: popIn 0.5s ease;
 }
 
 #winner {
     font-weight: bold;
     font-size: 16px;
+}
+
+/* ✨ Animation */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
