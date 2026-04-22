@@ -1,7 +1,7 @@
 // ===============================
-// ⚙ CONFIG (USE SCRIPT ADDRESS)
+// ⚙ CONFIG (IMPORTANT)
 // ===============================
-const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99"; // ✅ IMPORTANT
+const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99"; // ✅ script address
 const TICKET_PRICE = "0.0000001";
 
 let entries = [];
@@ -29,7 +29,7 @@ window.onload = function () {
 
                 document.getElementById("walletStatus").innerText = "✅ Connected";
 
-                loadEntries(); // 🔄 load tickets
+                loadEntries();
             }
 
             // ✅ After transaction approval
@@ -54,12 +54,12 @@ window.onload = function () {
 
 
 // ===============================
-// 🎟 BUY TICKET
+// 🎟 BUY TICKET (FIXED)
 // ===============================
 function buyTicket() {
 
     const state = {};
-    state[1] = "ticket_" + Date.now();
+    state[99] = "ticket_" + Date.now(); // ✅ CRITICAL FIX
 
     MINIMASK.account.send(
         TICKET_PRICE,
@@ -82,18 +82,18 @@ function buyTicket() {
 
 
 // ===============================
-// 📥 LOAD ENTRIES
+// 📥 LOAD ENTRIES (FIXED)
 // ===============================
 function loadEntries() {
 
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
 
-        console.log("Entries:", resp);
+        console.log("Entries response:", resp);
 
         entries = [];
         let html = "";
 
-        if (!resp.data || resp.data.length === 0) {
+        if (!resp || !resp.data || resp.data.length === 0) {
             html = "<li>No entries yet</li>";
         }
 
@@ -101,9 +101,10 @@ function loadEntries() {
 
             const coin = resp.data[i];
 
-            if (coin.state && coin.state[1]) {
+            // ✅ FIXED KEY (IMPORTANT)
+            if (coin.state && coin.state[99]) {
 
-                const entry = coin.state[1];
+                const entry = coin.state[99];
 
                 entries.push(entry);
 
