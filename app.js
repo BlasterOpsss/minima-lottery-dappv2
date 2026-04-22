@@ -1,22 +1,20 @@
 // ===============================
 // ⚙ CONFIG
 // ===============================
-const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99";
+const LOTTERY_ADDRESS = "0xA7F3C9B2E8D641";
 const TICKET_PRICE = 0.0000001;
 
 let entries = [];
 
 
 // ===============================
-// 🔌 INIT MINIMASK
+// 🔌 INIT
 // ===============================
 window.onload = function () {
 
     if (typeof MINIMASK !== "undefined") {
 
         MINIMASK.init(function (msg) {
-
-            console.log("MiniMask:", msg);
 
             if (msg.event === "MINIMASK_INIT") {
 
@@ -33,8 +31,7 @@ window.onload = function () {
             if (msg.event === "MINIMASK_PENDING") {
 
                 if (msg.data.response && msg.data.response.status) {
-                    console.log("Transaction confirmed");
-                    setTimeout(loadEntries, 6000); // wait for chain update
+                    setTimeout(loadEntries, 6000);
                 }
             }
         });
@@ -62,9 +59,7 @@ function buyTicket() {
         const time = new Date().toLocaleString();
 
         const state = {};
-        state[99] = wallet + "|" + time; // ✅ store wallet
-
-        console.log("Sending from wallet:", wallet);
+        state[99] = wallet + "|" + time;
 
         MINIMASK.account.send(
             TICKET_PRICE,
@@ -90,18 +85,13 @@ function buyTicket() {
 // ===============================
 function loadEntries() {
 
-    console.log("🔄 Loading entries...");
-
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
 
-        console.log("RAW COINS:", resp);
-
         entries = [];
-        let walletCounts = {};
         let html = "";
 
         if (!resp || !resp.data) {
-            console.log("No data returned");
+            document.getElementById("entries").innerHTML = "<li>No data</li>";
             return;
         }
 
@@ -115,8 +105,6 @@ function loadEntries() {
                 raw = decodeURI(raw);
             } catch (e) {}
 
-            console.log("STATE:", raw);
-
             const parts = raw.split("|");
 
             if (parts.length < 2) continue;
@@ -124,12 +112,7 @@ function loadEntries() {
             const wallet = parts[0].trim();
             const time = parts[1].trim();
 
-            console.log("Parsed wallet:", wallet);
-
             entries.push({ wallet, time });
-
-            // leaderboard count
-            walletCounts[wallet] = (walletCounts[wallet] || 0) + 1;
 
             html += `
                 <li>
@@ -144,8 +127,7 @@ function loadEntries() {
 
         document.getElementById("entryCount").innerText = entries.length;
 
-        updateLeaderboard(walletCounts);
-        updateStats(walletCounts);
+        updateStats();
         updatePool();
     });
 }
@@ -153,41 +135,9 @@ function loadEntries() {
 
 
 // ===============================
-// 💰 PRIZE POOL
-// ===============================
-function updatePool() {
-    const pool = entries.length * TICKET_PRICE;
-
-    document.getElementById("prizePool").innerText =
-        pool.toFixed(8) + " MINIMA";
-}
-
-
-
-// ===============================
-// 🏆 LEADERBOARD
-// ===============================
-function updateLeaderboard(counts) {
-
-    let sorted = Object.entries(counts)
-        .sort((a, b) => b[1] - a[1]);
-
-    let html = "";
-
-    sorted.forEach((w, i) => {
-        html += `<li>${i + 1}. ${short(w[0])} → ${w[1]} 🎟</li>`;
-    });
-
-    document.getElementById("leaderboard").innerHTML =
-        html || "<li>No data</li>";
-}
-
-
-
-// ===============================
 // 📊 YOUR STATS
 // ===============================
-function updateStats(counts) {
+function updateStats() {
 
     MINIMASK.account.getAddress(function (res) {
 
@@ -198,11 +148,28 @@ function updateStats(counts) {
 
         const wallet = res.data;
 
-        const count = counts[wallet] || 0;
+        let count = 0;
+
+        for (let e of entries) {
+            if (e.wallet === wallet) count++;
+        }
 
         document.getElementById("yourStats").innerText =
             short(wallet) + " → " + count + " tickets";
     });
+}
+
+
+
+// ===============================
+// 💰 PRIZE POOL
+// ===============================
+function updatePool() {
+
+    const pool = entries.length * TICKET_PRICE;
+
+    document.getElementById("prizePool").innerText =
+        pool.toFixed(8) + " MINIMA";
 }
 
 
