@@ -1,13 +1,21 @@
+// ===============================
+// ⚙ CONFIG
+// ===============================
 const LOTTERY_ADDRESS = "0xA7F3C9B2E8D641";
 const TICKET_PRICE = 0.0000001;
 
 let entries = [];
 
+// DOM refs
+let entriesList, entryCount, walletStatus, yourStats, prizePool, timer, winnerPopup, winnerText;
+
+
 // ===============================
-// GET WALLET SAFELY
+// 🔧 SAFE WALLET EXTRACT
 // ===============================
 function getWalletAddress(res) {
     if (!res || !res.status) return null;
+
     const d = res.data;
 
     if (typeof d === "string") return d;
@@ -18,17 +26,29 @@ function getWalletAddress(res) {
 
 
 // ===============================
-// INIT
+// 🔌 INIT
 // ===============================
 window.onload = function () {
+
+    // ✅ FIX: DOM elements loaded safely
+    entriesList = document.getElementById("entries");
+    entryCount = document.getElementById("entryCount");
+    walletStatus = document.getElementById("walletStatus");
+    yourStats = document.getElementById("yourStats");
+    prizePool = document.getElementById("prizePool");
+    timer = document.getElementById("timer");
+    winnerPopup = document.getElementById("winnerPopup");
+    winnerText = document.getElementById("winnerText");
 
     if (typeof MINIMASK !== "undefined") {
 
         MINIMASK.init(function (msg) {
 
+            console.log("MiniMask:", msg);
+
             if (msg.event === "MINIMASK_INIT") {
 
-                if (!msg.data.data.loggedon) {
+                if (!msg.data || !msg.data.data || !msg.data.data.loggedon) {
                     walletStatus.innerText = "❌ Not logged in";
                     return;
                 }
@@ -43,24 +63,35 @@ window.onload = function () {
             }
         });
 
+    } else {
+        walletStatus.innerText = "❌ MiniMask not found";
     }
+
+    startTimer();
 };
 
 
+
 // ===============================
-// BUY TICKET
+// 🎟 BUY TICKET
 // ===============================
 function buyTicket() {
 
     MINIMASK.account.getAddress(function (res) {
 
         const wallet = getWalletAddress(res);
-        if (!wallet) return alert("Wallet error");
+
+        if (!wallet) {
+            alert("Wallet error");
+            return;
+        }
 
         const time = new Date().toLocaleString();
 
         const state = {};
         state[99] = wallet + "|" + time;
+
+        console.log("Sending from:", wallet);
 
         MINIMASK.account.send(
             TICKET_PRICE,
@@ -68,26 +99,44 @@ function buyTicket() {
             "0x00",
             state,
             function (resp) {
-                if (resp.pending) alert("Approve transaction");
+
+                console.log("Send response:", resp);
+
+                if (resp.pending) {
+                    alert("Approve transaction in MiniMask");
+                } else {
+                    alert("Error: " + (resp.error || "Unknown"));
+                }
             }
         );
     });
 }
 
 
+
 // ===============================
-// LOAD ENTRIES
+// 📥 LOAD ENTRIES
 // ===============================
 function loadEntries() {
 
+    console.log("🔄 Loading entries from:", LOTTERY_ADDRESS);
+
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
+
+        console.log("RAW RESPONSE:", resp);
 
         entries = [];
         let html = "";
 
-        if (!resp || !resp.data) return;
+        if (!resp || !resp.data || resp.data.length === 0) {
+            entriesList.innerHTML = "<li>No entries</li>";
+            entryCount.innerText = 0;
+            updateStats(null);
+            updatePool();
+            return;
+        }
 
-        MINIMASK.account.getAddress(function(res){
+        MINIMASK.account.getAddress(function (res) {
 
             const myWallet = getWalletAddress(res);
 
@@ -99,9 +148,11 @@ function loadEntries() {
 
                     let raw = coin.state[key];
 
+                    if (!raw) continue;
+
                     try { raw = decodeURI(raw); } catch {}
 
-                    const parts = raw.split("|");
+                    const parts = String(raw).split("|");
 
                     if (parts.length >= 2) {
 
@@ -121,7 +172,7 @@ function loadEntries() {
                 }
             }
 
-            entriesList.innerHTML = html || "<li>No entries</li>";
+            entriesList.innerHTML = html || "<li>No valid entries</li>";
             entryCount.innerText = entries.length;
 
             updateStats(myWallet);
@@ -131,10 +182,16 @@ function loadEntries() {
 }
 
 
+
 // ===============================
-// STATS
+// 📊 STATS
 // ===============================
 function updateStats(myWallet) {
+
+    if (!myWallet) {
+        yourStats.innerText = "Not connected";
+        return;
+    }
 
     let count = 0;
 
@@ -146,8 +203,9 @@ function updateStats(myWallet) {
 }
 
 
+
 // ===============================
-// POOL
+// 💰 POOL
 // ===============================
 function updatePool() {
 
@@ -157,39 +215,46 @@ function updatePool() {
 }
 
 
+
 // ===============================
-// TIMER (3 DAYS)
+// ⏳ TIMER (3 DAYS)
 // ===============================
 const ROUND_DURATION = 3 * 24 * 60 * 60 * 1000;
+
 let startTime = Date.now();
 
-function updateTimer() {
+function startTimer() {
 
-    const diff = ROUND_DURATION - (Date.now() - startTime);
+    setInterval(() => {
 
-    if (diff <= 0) {
-        startTime = Date.now();
-        showWinner();
-        return;
-    }
+        const diff = ROUND_DURATION - (Date.now() - startTime);
 
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
+        if (diff <= 0) {
+            startTime = Date.now();
+            showWinner();
+            return;
+        }
 
-    timer.innerText =
-        `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
+        timer.innerText =
+            `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+
+    }, 1000);
 }
 
-setInterval(updateTimer, 1000);
 
 
 // ===============================
-// WINNER POPUP
+// 🎉 WINNER POPUP
 // ===============================
 function showWinner() {
 
     if (entries.length === 0) return;
+
+    const winner = entries[Math.floor(Math.random() * entries.length)];
 
     winnerText.innerText = "Winner selected 🎉";
 
@@ -201,7 +266,8 @@ function showWinner() {
 }
 
 
+
 // ===============================
-// LIVE UPDATE
+// 🔄 LIVE UPDATE
 // ===============================
 setInterval(loadEntries, 8000);
