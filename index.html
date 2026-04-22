@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minima Lottery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="images/logo.png" class="logo">
+        <h1>MINIMA LOTTERY</h1>
+    </div>
+
+    <!-- WALLET STATUS -->
+    <div class="card">
+        <p id="walletStatus">🔌 Connecting...</p>
+    </div>
+
+    <!-- BUY TICKET -->
+    <div class="card">
+        <p class="label">Ticket Price</p>
+        <h2>0.0000001 MINIMA</h2>
+
+        <button class="primary" onclick="buyTicket()">
+            🎟 Buy Ticket
+        </button>
+    </div>
+
+    <!-- WINNER -->
+    <div class="card">
+        <button class="secondary" onclick="drawWinner()">
+            🏆 Draw Winner
+        </button>
+
+        <div id="winnerBox">
+            <img src="images/trophy.png" id="winnerImg">
+            <p id="winner"></p>
+        </div>
+    </div>
+
+    <!-- ENTRIES -->
+    <div class="card">
+        <h3>Entries (<span id="entryCount">0</span>)</h3>
+        <ul id="entries"></ul>
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
