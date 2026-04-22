@@ -16,6 +16,8 @@ window.onload = function () {
 
         MINIMASK.init(function (msg) {
 
+            console.log("MiniMask:", msg);
+
             if (msg.event === "MINIMASK_INIT") {
 
                 if (!msg.data.data.loggedon) {
@@ -31,6 +33,7 @@ window.onload = function () {
             if (msg.event === "MINIMASK_PENDING") {
 
                 if (msg.data.response && msg.data.response.status) {
+                    console.log("Transaction confirmed");
                     setTimeout(loadEntries, 6000);
                 }
             }
@@ -59,7 +62,9 @@ function buyTicket() {
         const time = new Date().toLocaleString();
 
         const state = {};
-        state[99] = wallet + "|" + time;
+        state[99] = wallet + "|" + time; // important
+
+        console.log("Sending from wallet:", wallet);
 
         MINIMASK.account.send(
             TICKET_PRICE,
@@ -81,49 +86,67 @@ function buyTicket() {
 
 
 // ===============================
-// 📥 LOAD ENTRIES
+// 📥 LOAD ENTRIES (FIXED)
 // ===============================
 function loadEntries() {
 
+    console.log("🔄 Loading entries from:", LOTTERY_ADDRESS);
+
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
 
-        entries = [];
-        let html = "";
+        console.log("RAW RESPONSE:", resp);
 
-        if (!resp || !resp.data) {
-            document.getElementById("entries").innerHTML = "<li>No data</li>";
+        let html = "";
+        entries = [];
+
+        if (!resp || !resp.data || resp.data.length === 0) {
+            document.getElementById("entries").innerHTML = "<li>No entries yet</li>";
+            document.getElementById("entryCount").innerText = 0;
             return;
         }
 
         for (let coin of resp.data) {
 
-            if (!coin.state || !coin.state[99]) continue;
+            console.log("COIN:", coin);
 
-            let raw = coin.state[99];
+            if (!coin.state) continue;
 
-            try {
-                raw = decodeURI(raw);
-            } catch (e) {}
+            // 🔥 KEY FIX: read ALL state keys
+            for (let key in coin.state) {
 
-            const parts = raw.split("|");
+                let raw = coin.state[key];
 
-            if (parts.length < 2) continue;
+                if (!raw) continue;
 
-            const wallet = parts[0].trim();
-            const time = parts[1].trim();
+                try {
+                    raw = decodeURI(raw);
+                } catch (e) {}
 
-            entries.push({ wallet, time });
+                console.log("STATE VALUE:", raw);
 
-            html += `
-                <li>
-                    <b>${short(wallet)}</b><br>
-                    <small>${time}</small>
-                </li>
-            `;
+                const parts = raw.split("|");
+
+                if (parts.length >= 2) {
+
+                    const wallet = parts[0].trim();
+                    const time = parts[1].trim();
+
+                    entries.push({ wallet, time });
+
+                    html += `
+                        <li>
+                            🎟 Ticket<br>
+                            <small>${time}</small>
+                        </li>
+                    `;
+                }
+            }
         }
 
+        console.log("FINAL ENTRIES:", entries);
+
         document.getElementById("entries").innerHTML =
-            html || "<li>No entries yet</li>";
+            html || "<li>No valid entries found</li>";
 
         document.getElementById("entryCount").innerText = entries.length;
 
@@ -155,7 +178,7 @@ function updateStats() {
         }
 
         document.getElementById("yourStats").innerText =
-            short(wallet) + " → " + count + " tickets";
+            "Your Tickets: " + count;
     });
 }
 
@@ -170,16 +193,6 @@ function updatePool() {
 
     document.getElementById("prizePool").innerText =
         pool.toFixed(8) + " MINIMA";
-}
-
-
-
-// ===============================
-// 🔧 HELPERS
-// ===============================
-function short(addr) {
-    if (!addr) return "???";
-    return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
 
