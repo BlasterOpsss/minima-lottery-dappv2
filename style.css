@@ -1,0 +1,114 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #111, #000);
+    color: white;
+}
+
+.container {
+    max-width: 480px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 70px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+/* CARDS */
+.card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 15px 0;
+    transition: 0.3s;
+}
+
+.card:hover {
+    border-color: white;
+    transform: translateY(-3px);
+}
+
+/* TEXT */
+.label {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+h2 {
+    margin: 5px 0 15px;
+}
+
+/* BUTTONS */
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.primary {
+    background: white;
+    color: black;
+    border: none;
+}
+
+.primary:hover {
+    background: #ddd;
+}
+
+.secondary {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+.secondary:hover {
+    background: white;
+    color: black;
+}
+
+/* ENTRIES */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 13px;
+}
+
+/* WINNER */
+#winnerBox {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#winnerImg {
+    width: 60px;
+    display: none;
+    margin-bottom: 10px;
+}
+
+#winner {
+    font-weight: bold;
+    font-size: 16px;
+}
