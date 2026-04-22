@@ -20,7 +20,7 @@ window.onload = function () {
 
             if (msg.event === "MINIMASK_INIT") {
 
-                if (!msg.data.data.loggedon) {
+                if (!msg.data || !msg.data.data || !msg.data.data.loggedon) {
                     document.getElementById("walletStatus").innerText = "❌ Not logged in";
                     return;
                 }
@@ -32,7 +32,7 @@ window.onload = function () {
 
             if (msg.event === "MINIMASK_PENDING") {
 
-                if (msg.data.response && msg.data.response.status) {
+                if (msg.data && msg.data.response && msg.data.response.status) {
                     console.log("Transaction confirmed");
                     setTimeout(loadEntries, 6000);
                 }
@@ -58,13 +58,13 @@ function buyTicket() {
             return;
         }
 
-        const wallet = res.data;
+        const wallet = String(res.data || "");
         const time = new Date().toLocaleString();
 
         const state = {};
-        state[99] = wallet + "|" + time; // important
+        state[99] = wallet + "|" + time;
 
-        console.log("Sending from wallet:", wallet);
+        console.log("Sending from:", wallet);
 
         MINIMASK.account.send(
             TICKET_PRICE,
@@ -73,10 +73,12 @@ function buyTicket() {
             state,
             function (resp) {
 
+                console.log("Send response:", resp);
+
                 if (resp.pending) {
                     alert("Approve transaction in MiniMask");
                 } else {
-                    console.log("Error:", resp);
+                    alert("Error: " + (resp.error || "Unknown"));
                 }
             }
         );
@@ -102,16 +104,16 @@ function loadEntries() {
         if (!resp || !resp.data || resp.data.length === 0) {
             document.getElementById("entries").innerHTML = "<li>No entries yet</li>";
             document.getElementById("entryCount").innerText = 0;
+            updateStats();
+            updatePool();
             return;
         }
 
         for (let coin of resp.data) {
 
-            console.log("COIN:", coin);
+            if (!coin || !coin.state) continue;
 
-            if (!coin.state) continue;
-
-            // 🔥 KEY FIX: read ALL state keys
+            // 🔥 Read all state values
             for (let key in coin.state) {
 
                 let raw = coin.state[key];
@@ -122,9 +124,7 @@ function loadEntries() {
                     raw = decodeURI(raw);
                 } catch (e) {}
 
-                console.log("STATE VALUE:", raw);
-
-                const parts = raw.split("|");
+                const parts = String(raw).split("|");
 
                 if (parts.length >= 2) {
 
@@ -142,8 +142,6 @@ function loadEntries() {
                 }
             }
         }
-
-        console.log("FINAL ENTRIES:", entries);
 
         document.getElementById("entries").innerHTML =
             html || "<li>No valid entries found</li>";
@@ -169,7 +167,7 @@ function updateStats() {
             return;
         }
 
-        const wallet = res.data;
+        const wallet = String(res.data || "");
 
         let count = 0;
 
@@ -193,6 +191,25 @@ function updatePool() {
 
     document.getElementById("prizePool").innerText =
         pool.toFixed(8) + " MINIMA";
+}
+
+
+
+// ===============================
+// 🔧 SAFE SHORT FUNCTION (FIXED)
+// ===============================
+function short(addr) {
+    if (!addr || typeof addr !== "string") return "???";
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
+
+
+
+// ===============================
+// 🚫 DISABLED DRAW WINNER (NO ERROR)
+// ===============================
+function drawWinner() {
+    console.log("Draw winner disabled");
 }
 
 
