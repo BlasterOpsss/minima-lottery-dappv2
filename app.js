@@ -1,19 +1,22 @@
 // ===============================
+// ⚙ CONFIG
+// ===============================
 const LOTTERY_ADDRESS = "0xFFEEDDFFEEDD99";
 const TICKET_PRICE = 0.0000001;
-const MAX_TICKETS = 5;
 
 let entries = [];
-let CURRENT_ROUND = 1;
-let DRAW_LOCKED = false;
 
 
-// INIT
+// ===============================
+// 🔌 INIT MINIMASK
+// ===============================
 window.onload = function () {
 
     if (typeof MINIMASK !== "undefined") {
 
         MINIMASK.init(function (msg) {
+
+            console.log("MiniMask:", msg);
 
             if (msg.event === "MINIMASK_INIT") {
 
@@ -23,31 +26,45 @@ window.onload = function () {
                 }
 
                 document.getElementById("walletStatus").innerText = "✅ Connected";
+
                 loadEntries();
             }
 
             if (msg.event === "MINIMASK_PENDING") {
+
                 if (msg.data.response && msg.data.response.status) {
-                    loadEntries();
+                    console.log("Transaction confirmed");
+                    setTimeout(loadEntries, 6000); // wait for chain update
                 }
             }
         });
+
+    } else {
+        document.getElementById("walletStatus").innerText = "❌ MiniMask not found";
     }
 };
 
 
-// BUY
+
+// ===============================
+// 🎟 BUY TICKET
+// ===============================
 function buyTicket() {
 
     MINIMASK.account.getAddress(function (res) {
 
-        if (!res.status) return;
+        if (!res || !res.status) {
+            alert("Login to MiniMask first");
+            return;
+        }
 
         const wallet = res.data;
         const time = new Date().toLocaleString();
 
         const state = {};
-        state[99] = `${wallet}|${time}|${CURRENT_ROUND}`;
+        state[99] = wallet + "|" + time; // ✅ store wallet
+
+        console.log("Sending from wallet:", wallet);
 
         MINIMASK.account.send(
             TICKET_PRICE,
@@ -55,131 +72,101 @@ function buyTicket() {
             "0x00",
             state,
             function (resp) {
-                if (resp.pending) alert("Approve transaction");
+
+                if (resp.pending) {
+                    alert("Approve transaction in MiniMask");
+                } else {
+                    console.log("Error:", resp);
+                }
             }
         );
     });
 }
 
 
-// LOAD
+
+// ===============================
+// 📥 LOAD ENTRIES
+// ===============================
 function loadEntries() {
 
+    console.log("🔄 Loading entries...");
+
     MINIMASK.meg.listcoins(LOTTERY_ADDRESS, "0x00", "", function (resp) {
+
+        console.log("RAW COINS:", resp);
 
         entries = [];
         let walletCounts = {};
         let html = "";
 
-        if (!resp.data) return;
+        if (!resp || !resp.data) {
+            console.log("No data returned");
+            return;
+        }
 
         for (let coin of resp.data) {
 
             if (!coin.state || !coin.state[99]) continue;
 
-            const raw = decodeURI(coin.state[99]);
+            let raw = coin.state[99];
+
+            try {
+                raw = decodeURI(raw);
+            } catch (e) {}
+
+            console.log("STATE:", raw);
+
             const parts = raw.split("|");
 
-            if (parts.length < 3) continue;
+            if (parts.length < 2) continue;
 
-            const wallet = parts[0];
-            const time = parts[1];
-            const round = parseInt(parts[2]);
+            const wallet = parts[0].trim();
+            const time = parts[1].trim();
 
-            if (round !== CURRENT_ROUND) continue;
+            console.log("Parsed wallet:", wallet);
 
             entries.push({ wallet, time });
 
+            // leaderboard count
             walletCounts[wallet] = (walletCounts[wallet] || 0) + 1;
 
-            html += `<li><b>${short(wallet)}</b><br><small>${time}</small></li>`;
+            html += `
+                <li>
+                    <b>${short(wallet)}</b><br>
+                    <small>${time}</small>
+                </li>
+            `;
         }
 
-        document.getElementById("entries").innerHTML = html;
+        document.getElementById("entries").innerHTML =
+            html || "<li>No entries yet</li>";
+
         document.getElementById("entryCount").innerText = entries.length;
-        document.getElementById("round").innerText = CURRENT_ROUND;
 
         updateLeaderboard(walletCounts);
         updateStats(walletCounts);
         updatePool();
-
-        if (entries.length >= MAX_TICKETS && !DRAW_LOCKED) {
-            DRAW_LOCKED = true;
-            setTimeout(drawWinner, 1000);
-        }
     });
 }
 
 
-// FAIR WINNER
-function drawWinner() {
 
-    if (entries.length === 0) return;
-
-    const seed = "ROUND_" + CURRENT_ROUND;
-    const hash = simpleHash(seed);
-    const index = hash % entries.length;
-
-    const winner = entries[index];
-
-    showWinner(winner.wallet);
-    payout(winner.wallet);
-
-    CURRENT_ROUND++;
-    DRAW_LOCKED = false;
-
-    setTimeout(loadEntries, 3000);
-}
-
-
-// HASH
-function simpleHash(str) {
-    let h = 0;
-    for (let i = 0; i < str.length; i++) {
-        h = (h << 5) - h + str.charCodeAt(i);
-        h |= 0;
-    }
-    return Math.abs(h);
-}
-
-
-// PAYOUT
-function payout(wallet) {
-
-    const pool = entries.length * TICKET_PRICE;
-
-    MINIMASK.account.send(
-        pool,
-        wallet,
-        "0x00",
-        { payout: true },
-        function (resp) {
-            if (resp.pending) alert("Approve payout");
-        }
-    );
-}
-
-
-// UI
-function showWinner(wallet) {
-
-    document.getElementById("winnerBox").style.display = "block";
-    document.getElementById("winner").innerHTML =
-        "🏆 Winner<br><b>" + short(wallet) + "</b>";
-
-    confetti();
-}
-
-
-// POOL
+// ===============================
+// 💰 PRIZE POOL
+// ===============================
 function updatePool() {
     const pool = entries.length * TICKET_PRICE;
+
     document.getElementById("prizePool").innerText =
         pool.toFixed(8) + " MINIMA";
 }
 
 
-// LEADERBOARD
+
+// ===============================
+// 🏆 LEADERBOARD
+// ===============================
 function updateLeaderboard(counts) {
 
     let sorted = Object.entries(counts)
@@ -188,48 +175,49 @@ function updateLeaderboard(counts) {
     let html = "";
 
     sorted.forEach((w, i) => {
-        html += `<li>${i+1}. ${short(w[0])} → ${w[1]}</li>`;
+        html += `<li>${i + 1}. ${short(w[0])} → ${w[1]} 🎟</li>`;
     });
 
-    document.getElementById("leaderboard").innerHTML = html;
+    document.getElementById("leaderboard").innerHTML =
+        html || "<li>No data</li>";
 }
 
 
-// STATS
+
+// ===============================
+// 📊 YOUR STATS
+// ===============================
 function updateStats(counts) {
 
     MINIMASK.account.getAddress(function (res) {
 
-        if (!res.status) return;
+        if (!res || !res.status) {
+            document.getElementById("yourStats").innerText = "Not connected";
+            return;
+        }
 
-        const c = counts[res.data] || 0;
+        const wallet = res.data;
+
+        const count = counts[wallet] || 0;
 
         document.getElementById("yourStats").innerText =
-            short(res.data) + " → " + c + " tickets";
+            short(wallet) + " → " + count + " tickets";
     });
 }
 
 
-// HELPERS
+
+// ===============================
+// 🔧 HELPERS
+// ===============================
 function short(addr) {
-    return addr.slice(0,6) + "..." + addr.slice(-4);
+    if (!addr) return "???";
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
 
-// CONFETTI
-function confetti() {
-    for (let i=0;i<15;i++){
-        let e=document.createElement("div");
-        e.innerText="🎉";
-        e.style.position="fixed";
-        e.style.left=Math.random()*100+"vw";
-        e.style.top="-20px";
-        document.body.appendChild(e);
-        let t=setInterval(()=>e.style.top=(e.offsetTop+5)+"px",30);
-        setTimeout(()=>{clearInterval(t);e.remove()},2000);
-    }
-}
 
-
-// AUTO REFRESH
+// ===============================
+// 🔄 AUTO REFRESH
+// ===============================
 setInterval(loadEntries, 10000);
