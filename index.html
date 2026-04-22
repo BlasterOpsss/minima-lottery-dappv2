@@ -1,73 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Minima Lottery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="style.css">
+  <title>Minima Lottery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- HEADER -->
-    <div class="header">
-    <div class="logo">🟣</div>
-    <div>
-        <h1>Minima Lottery</h1>
-        <p class="subtitle">Fair • On-chain • Transparent</p>
-    </div>
-    </div>
+  <!-- HEADER -->
+  <div class="header">
+    <h1>MINIMA<br>LOTTERY</h1>
+    <div class="line"></div>
+    <p class="subtitle">TRANSPARENT • FAIR • DECENTRALIZED</p>
+  </div>
 
-    <!-- WALLET STATUS -->
-    <div class="card">
-        <p id="walletStatus">🔌 Connecting...</p>
-    </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button onclick="showTab('overview')" class="tab active">OVERVIEW</button>
+    <button onclick="showTab('tickets')" class="tab">TICKETS</button>
+    <button onclick="showTab('winners')" class="tab">WINNERS</button>
+  </div>
 
-    <!-- TIMER -->
-    <div class="card">
-        <h3>⏳ Next Draw</h3>
+  <!-- OVERVIEW -->
+  <div id="overview" class="tab-content">
+
+    <div class="grid">
+
+      <!-- TIMER -->
+      <div class="card big">
+        <p class="label">⏳ NEXT DRAW</p>
         <h2 id="timer">--:--:--</h2>
+        <p class="small">Draw every 24h</p>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="side">
+
+        <div class="card">
+          <p class="label">💰 PRIZE POOL</p>
+          <h2 id="prizePool">0</h2>
+          <p class="small">MINIMA</p>
+        </div>
+
+        <div class="card">
+          <p class="label">🎟 TICKET PRICE</p>
+          <h2>0.0000001</h2>
+          <p class="small">MINIMA</p>
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- PRIZE POOL -->
-    <div class="card glow">
-        <h3>💰 Prize Pool</h3>
-        <h2 id="prizePool">0 MINIMA</h2>
-    </div>
+  </div>
 
-    <!-- BUY -->
+  <!-- TICKETS -->
+  <div id="tickets" class="tab-content hidden">
+
     <div class="card">
-        <h3>🎟 Ticket Price</h3>
-        <h2>0.0000001 MINIMA</h2>
-        <button onclick="buyTicket()">Buy Ticket</button>
+      <h3>BUY LOTTERY TICKET</h3>
+      <p>Each ticket costs 0.0000001 MINIMA</p>
+      <button onclick="buyTicket()">BUY TICKET</button>
     </div>
 
-    <!-- ENTRIES -->
     <div class="card">
-        <h3>Entries (<span id="entryCount">0</span>)</h3>
-        <ul id="entries"></ul>
+      <h3>YOUR TICKETS</h3>
+      <ul id="entries"></ul>
     </div>
 
-    <!-- STATS -->
+  </div>
+
+  <!-- WINNERS -->
+  <div id="winners" class="tab-content hidden">
+
     <div class="card">
-        <h3>📊 Your Stats</h3>
-        <p id="yourStats">Loading...</p>
+      <h3>RECENT WINNERS</h3>
+      <div id="winnerList"></div>
     </div>
+
+  </div>
 
 </div>
 
-<!-- 🎉 WINNER POPUP -->
-<div id="winnerPopup" class="popup hidden">
-    <div class="popup-box">
-        <h2>🎉 WINNER 🎉</h2>
-        <p id="winnerText"></p>
-    </div>
-</div>
-
-<!-- SCRIPT -->
 <script src="app.js"></script>
+
+<script>
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(tab).classList.remove('hidden');
+
+  document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
 
 </body>
 </html>
