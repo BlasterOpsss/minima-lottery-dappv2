@@ -1,116 +1,73 @@
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: radial-gradient(circle at top, #0a0a0a, #000);
-    color: #fff;
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minima Lottery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* layout */
-.container {
-    max-width: 420px;
-    margin: auto;
-    padding: 24px 16px;
-}
+    <link rel="stylesheet" href="style.css">
+</head>
 
-/* title */
-.gradient-text {
-    text-align: center;
-    font-size: 20px;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, #bfff00, #ffffff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+<body>
 
-.subtitle {
-    text-align: center;
-    font-size: 12px;
-    color: #777;
-    margin-bottom: 20px;
-}
+<div class="container">
 
-/* GLASS CARD */
-.glass {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(12px);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 14px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-}
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">🟣</div>
+        <div>
+            <h1>Minima Lottery</h1>
+            <p class="subtitle">Fair • On-chain • Transparent</p>
+        </div>
+    </div>
 
-/* headings */
-h3 {
-    font-size: 13px;
-    color: #aaa;
-}
+    <!-- WALLET STATUS -->
+    <div class="card">
+        <p id="walletStatus">🔌 Connecting...</p>
+    </div>
 
-h2 {
-    margin: 6px 0;
-}
+    <!-- TIMER -->
+    <div class="card">
+        <h3>⏳ Next Draw</h3>
+        <h2 id="timer">--:--:--</h2>
+    </div>
 
-/* neon glow */
-.glow {
-    box-shadow:
-        0 0 10px rgba(191,255,0,0.3),
-        0 0 25px rgba(191,255,0,0.15);
-}
+    <!-- PRIZE POOL -->
+    <div class="card glow">
+        <h3>💰 Prize Pool</h3>
+        <h2 id="prizePool">0 MINIMA</h2>
+    </div>
 
-/* button */
-button {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 600;
-    background: linear-gradient(135deg, #bfff00, #ffffff);
-    color: #000;
-    cursor: pointer;
-    transition: 0.2s;
-}
+    <!-- BUY -->
+    <div class="card">
+        <h3>🎟 Ticket Price</h3>
+        <h2>0.0000001 MINIMA</h2>
+        <button onclick="buyTicket()">Buy Ticket</button>
+    </div>
 
-button:hover {
-    transform: scale(1.03);
-}
+    <!-- ENTRIES -->
+    <div class="card">
+        <h3>Entries (<span id="entryCount">0</span>)</h3>
+        <ul id="entries"></ul>
+    </div>
 
-/* entries */
-#entries {
-    list-style: none;
-    padding: 0;
-}
+    <!-- STATS -->
+    <div class="card">
+        <h3>📊 Your Stats</h3>
+        <p id="yourStats">Loading...</p>
+    </div>
 
-#entries li {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
-}
+</div>
 
-/* highlight user */
-.mine {
-    border: 1px solid #bfff00;
-    background: rgba(191,255,0,0.08);
-}
+<!-- 🎉 WINNER POPUP -->
+<div id="winnerPopup" class="popup hidden">
+    <div class="popup-box">
+        <h2>🎉 WINNER 🎉</h2>
+        <p id="winnerText"></p>
+    </div>
+</div>
 
-/* popup */
-.popup {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+<!-- SCRIPT -->
+<script src="app.js"></script>
 
-.popup-box {
-    padding: 30px;
-    text-align: center;
-}
-
-/* hidden */
-.hidden {
-    display: none;
-}
+</body>
+</html>
