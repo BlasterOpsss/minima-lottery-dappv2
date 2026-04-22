@@ -1,73 +1,160 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Minima Lottery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* ===== BASE ===== */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(180deg, #f3f0ff, #ffffff);
+    color: #111;
+}
 
-    <link rel="stylesheet" href="style.css">
-</head>
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 420px;
+    margin: auto;
+    padding: 20px 16px;
+}
 
-<body>
+/* ===== HEADER ===== */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
 
-<div class="container">
+.logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ab9cff, #6c5ce7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+}
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="logo">🟣</div>
-        <div>
-            <h1>Minima Lottery</h1>
-            <p class="subtitle">Fair • On-chain • Transparent</p>
-        </div>
-    </div>
+h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
 
-    <!-- WALLET STATUS -->
-    <div class="card">
-        <p id="walletStatus">🔌 Connecting...</p>
-    </div>
+.subtitle {
+    font-size: 12px;
+    color: #777;
+}
 
-    <!-- TIMER -->
-    <div class="card">
-        <h3>⏳ Next Draw</h3>
-        <h2 id="timer">--:--:--</h2>
-    </div>
+/* ===== CARD ===== */
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
 
-    <!-- PRIZE POOL -->
-    <div class="card glow">
-        <h3>💰 Prize Pool</h3>
-        <h2 id="prizePool">0 MINIMA</h2>
-    </div>
+.card:hover {
+    transform: translateY(-2px);
+}
 
-    <!-- BUY -->
-    <div class="card">
-        <h3>🎟 Ticket Price</h3>
-        <h2>0.0000001 MINIMA</h2>
-        <button onclick="buyTicket()">Buy Ticket</button>
-    </div>
+/* ===== HEADINGS ===== */
+.card h3 {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+}
 
-    <!-- ENTRIES -->
-    <div class="card">
-        <h3>Entries (<span id="entryCount">0</span>)</h3>
-        <ul id="entries"></ul>
-    </div>
+.card h2 {
+    margin: 6px 0;
+    font-size: 20px;
+}
 
-    <!-- STATS -->
-    <div class="card">
-        <h3>📊 Your Stats</h3>
-        <p id="yourStats">Loading...</p>
-    </div>
+/* ===== TIMER ===== */
+#timer {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
 
-</div>
+/* ===== BUTTON ===== */
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-<!-- 🎉 WINNER POPUP -->
-<div id="winnerPopup" class="popup hidden">
-    <div class="popup-box">
-        <h2>🎉 WINNER 🎉</h2>
-        <p id="winnerText"></p>
-    </div>
-</div>
+button:hover {
+    transform: scale(1.02);
+}
 
-<!-- SCRIPT -->
-<script src="app.js"></script>
+button:active {
+    transform: scale(0.96);
+}
 
-</body>
-</html>
+/* ===== PRIZE POOL ACCENT ===== */
+.glow {
+    border: 1px solid #e6e2ff;
+}
+
+/* ===== ENTRIES ===== */
+#entries {
+    list-style: none;
+    padding: 0;
+}
+
+#entries li {
+    background: #f8f7ff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ===== YOUR ENTRY ===== */
+.mine {
+    background: #eae7ff;
+    border: 1px solid #c7c2ff;
+}
+
+/* ===== STATS ===== */
+#yourStats {
+    font-size: 13px;
+    color: #555;
+}
+
+/* ===== POPUP ===== */
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    animation: pop 0.3s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes pop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
